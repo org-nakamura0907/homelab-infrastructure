@@ -18,11 +18,6 @@ moved {
   from = module.k3s_staging_server_1.proxmox_vm_qemu.this
   to   = module.vm["k3s-staging-server-1"].proxmox_vm_qemu.this
 }
-moved {
-  from = module.openmediavault.proxmox_vm_qemu.this
-  to   = module.vm_rootuser["openmediavault"].proxmox_vm_qemu.this
-}
-
 // ---- LXC ----
 moved {
   from = module.secret_manager.proxmox_lxc.this

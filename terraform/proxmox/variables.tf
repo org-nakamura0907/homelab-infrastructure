@@ -13,9 +13,6 @@ variable "pm_api_token_secret" {
   type      = string
   sensitive = true
 }
-variable "openmediavault_passthrough_file" {
-  type = string
-}
 variable "pm_rootuser" {
   type = string
 }

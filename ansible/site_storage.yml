@@ -1,0 +1,79 @@
+---
+- name: Setup NFS storage on Proxmox host
+  hosts: proxmox
+  gather_facts: false
+
+  vars:
+    storage_device: /dev/sda
+    storage_mount: /mnt/data
+    storage_dirs:
+      - k8s
+      - lxc
+      - media
+    nfs_network: 192.168.0.0/24
+
+  tasks:
+    - name: Check if filesystem exists on storage device
+      ansible.builtin.command: blkid -s TYPE -o value {{ storage_device }}
+      register: blkid_result
+      changed_when: false
+      failed_when: false
+
+    - name: Create ext4 filesystem on storage device
+      ansible.builtin.command: mkfs.ext4 -L data {{ storage_device }}
+      when: blkid_result.stdout == ""
+      changed_when: true
+
+    - name: Get storage device UUID
+      ansible.builtin.command: blkid -s UUID -o value {{ storage_device }}
+      register: disk_uuid
+      changed_when: false
+
+    - name: Ensure mount point exists
+      ansible.builtin.file:
+        path: "{{ storage_mount }}"
+        state: directory
+        mode: "0755"
+
+    - name: Mount storage device (persistent via fstab)
+      ansible.builtin.mount:
+        path: "{{ storage_mount }}"
+        src: "UUID={{ disk_uuid.stdout }}"
+        fstype: ext4
+        opts: defaults,nofail
+        state: mounted
+
+    - name: Create data directories
+      ansible.builtin.file:
+        path: "{{ storage_mount }}/{{ item }}"
+        state: directory
+        mode: "0755"
+      loop: "{{ storage_dirs }}"
+
+    - name: Install NFS server
+      ansible.builtin.apt:
+        name: nfs-kernel-server
+        state: present
+        update_cache: true
+
+    - name: Configure NFS exports
+      ansible.builtin.copy:
+        dest: /etc/exports
+        content: |
+          {{ storage_mount }}/k8s   {{ nfs_network }}(rw,sync,no_subtree_check,no_root_squash)
+          {{ storage_mount }}/lxc   {{ nfs_network }}(rw,sync,no_subtree_check,no_root_squash)
+          {{ storage_mount }}/media {{ nfs_network }}(rw,sync,no_subtree_check,no_root_squash)
+        mode: "0644"
+      notify: Re-export NFS shares
+
+    - name: Enable and start NFS server
+      ansible.builtin.service:
+        name: nfs-server
+        state: started
+        enabled: true
+      ignore_errors: "{{ ansible_check_mode }}"
+
+  handlers:
+    - name: Re-export NFS shares
+      ansible.builtin.command: exportfs -ra
+      changed_when: true

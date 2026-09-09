@@ -37,19 +37,6 @@ locals {
       onboot       = false
       vm_state     = "stopped"
     }
-    "openmediavault" = {
-      vmid              = 9210
-      ip                = "ip=192.168.0.210/24"
-      sockets           = 1
-      cores             = 1
-      memory            = "2048"
-      storage_size      = "6G"
-      onboot            = false
-      vm_state          = "stopped"
-      add_passthrough   = true
-      passthrough_file  = var.openmediavault_passthrough_file
-      use_root_provider = true
-    }
   }
 
   // ---- LXC 台帳 ----
