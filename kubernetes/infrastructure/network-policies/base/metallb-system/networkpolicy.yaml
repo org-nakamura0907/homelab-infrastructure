@@ -12,8 +12,9 @@ spec:
   policyTypes:
     - Ingress
 ---
-# apiserver(server node のホスト IP 発)からの validating webhook 呼び出しを許可。
+# apiserver からの validating webhook 呼び出しを許可。
 # 無いと IPAddressPool/L2Advertisement/LoadBalancer Service の変更が全て拒否される。
+# 送信元は LAN node IP(192.168.0.0/24) または Flannel pod CIDR(10.42.0.0/16)になる。
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
@@ -29,6 +30,8 @@ spec:
     - from:
         - ipBlock:
             cidr: 192.168.0.0/24
+        - ipBlock:
+            cidr: 10.42.0.0/16
       ports:
         - port: 9443
           protocol: TCP

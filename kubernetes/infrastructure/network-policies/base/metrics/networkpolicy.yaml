@@ -27,8 +27,9 @@ spec:
     - from:
         - podSelector: {}
 ---
-# apiserver(server node のホスト IP 発)からの prometheus-operator admission webhook(containerPort 10250)を許可。
+# apiserver からの prometheus-operator admission webhook(containerPort 10250)を許可。
 # 無いと ServiceMonitor / PrometheusRule の apply(= Flux の HelmRelease reconcile)が全て失敗する。
+# 送信元は LAN node IP(192.168.0.0/24) または Flannel pod CIDR(10.42.0.0/16)になる。
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
@@ -44,6 +45,8 @@ spec:
     - from:
         - ipBlock:
             cidr: 192.168.0.0/24
+        - ipBlock:
+            cidr: 10.42.0.0/16
       ports:
         - port: 10250
           protocol: TCP
