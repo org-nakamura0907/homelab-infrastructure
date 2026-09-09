@@ -18,9 +18,11 @@
     storage_device: /dev/sda
     storage_mount: /mnt/data
     storage_dirs:
-      - k8s
-      - lxc
-      - media
+      - name: k8s
+      - name: lxc
+      - name: media
+        owner: "1000"
+        group: "1000"
     nfs_network: 192.168.0.0/24
 
   tasks:
@@ -56,8 +58,10 @@
 
     - name: Create data directories
       ansible.builtin.file:
-        path: "{{ storage_mount }}/{{ item }}"
+        path: "{{ storage_mount }}/{{ item.name }}"
         state: directory
+        owner: "{{ item.owner | default('root') }}"
+        group: "{{ item.group | default('root') }}"
         mode: "0755"
       loop: "{{ storage_dirs }}"
 
