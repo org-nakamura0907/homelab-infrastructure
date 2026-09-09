@@ -16,11 +16,7 @@ spec:
     spec:
       containers:
         - name: filebrowser
-          # filebrowser/filebrowser は 2026-09-01 にアーカイブ済み
-          image: filebrowser/filebrowser:v2
-          args:
-            - --database=/config/filebrowser.db
-            - --root=/srv
+          image: ghcr.io/gtsteffaniak/filebrowser:1.5.6-stable
           ports:
             - containerPort: 80
           resources:
@@ -31,14 +27,20 @@ spec:
               cpu: 100m
               memory: 128Mi
           volumeMounts:
-            - name: config
-              mountPath: /config
+            - name: data
+              mountPath: /home/filebrowser/data
+            - name: config-yaml
+              mountPath: /home/filebrowser/data/config.yaml
+              subPath: config.yaml
             - name: media
               mountPath: /srv
       volumes:
-        - name: config
+        - name: data
           persistentVolumeClaim:
             claimName: filebrowser-config
+        - name: config-yaml
+          configMap:
+            name: filebrowser-config
         - name: media
           nfs:
             server: 192.168.0.200
