@@ -1,0 +1,45 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: filebrowser
+  namespace: filebrowser
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: filebrowser
+  template:
+    metadata:
+      labels:
+        app: filebrowser
+    spec:
+      containers:
+        - name: filebrowser
+          # filebrowser/filebrowser は 2026-09-01 にアーカイブ済み
+          image: filebrowser/filebrowser:v2
+          args:
+            - --database=/config/filebrowser.db
+            - --root=/srv
+          ports:
+            - containerPort: 80
+          resources:
+            requests:
+              cpu: 10m
+              memory: 32Mi
+            limits:
+              cpu: 100m
+              memory: 128Mi
+          volumeMounts:
+            - name: config
+              mountPath: /config
+            - name: media
+              mountPath: /srv
+      volumes:
+        - name: config
+          persistentVolumeClaim:
+            claimName: filebrowser-config
+        - name: media
+          nfs:
+            server: 192.168.0.200
+            path: /mnt/data/media

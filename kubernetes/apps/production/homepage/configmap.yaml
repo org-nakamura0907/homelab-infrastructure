@@ -32,6 +32,10 @@ data:
           icon: grafana
           href: https://grafana.home.arpa/
           description: Analytics and Monitoring
+      - Filebrowser:
+          icon: filebrowser
+          href: https://files.home.arpa
+          description: File Manager
   kubernetes.yaml: |
     {}
   docker.yaml: |

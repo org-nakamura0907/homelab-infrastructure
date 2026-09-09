@@ -33,7 +33,6 @@ dns_records:
   - { ip: "192.168.0.112", name: "k3s-agent-2" }
   - { ip: "192.168.0.120", name: "staging.k3s-server-1" }
   - { ip: "192.168.0.200", name: "proxmox" }
-  - { ip: "192.168.0.210", name: "openmediavault" }
   - { ip: "192.168.0.211", name: "ca" }
   - { ip: "192.168.0.213", name: "dns" }
   - { ip: "192.168.0.213", name: "pihole" }
@@ -41,4 +40,5 @@ dns_records:
   - { ip: "192.168.0.214", name: "grafana" }
   - { ip: "192.168.0.214", name: "prometheus" }
   - { ip: "192.168.0.230", name: "homepage" }
+  - { ip: "192.168.0.230", name: "files" }
   - { ip: "192.168.0.230", name: "auth" } # IdP(Authelia)用に予約
